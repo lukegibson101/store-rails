@@ -48,9 +48,8 @@ RUN bundle exec bootsnap precompile app/ lib/
 # Precompiling assets for production without requiring secret RAILS_MASTER_KEY
 RUN SECRET_KEY_BASE_DUMMY=1 bundle exec rails assets:precompile
 
-
-
-
+# Ensure the docker-entrypoint script is executable
+RUN chmod +x /rails/bin/docker-entrypoint
 
 # Final stage for app image
 FROM base
@@ -65,15 +64,9 @@ RUN groupadd --system --gid 1000 rails && \
     chown -R rails:rails db log storage tmp
 USER 1000:1000
 
-# Ensure the docker-entrypoint script is executable
-RUN chmod +x /rails/bin/docker-entrypoint
-
 # Entrypoint prepares the database.
 ENTRYPOINT ["/rails/bin/docker-entrypoint"]
 
 # Start server via Thruster by default, this can be overwritten at runtime
 EXPOSE 80
 CMD ["./bin/thrust", "./bin/rails", "server"]
-
-
-
